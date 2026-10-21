@@ -1,6 +1,6 @@
 # Sun Son Solar
 
-Beginner-friendly PHP and MariaDB registration/login project for XAMPP.
+PHP and MariaDB registration/login project for XAMPP.
 
 ## Folder guide
 - `config/database.php` - database connection settings
