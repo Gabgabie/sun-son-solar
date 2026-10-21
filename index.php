@@ -1,49 +1,67 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/models/User.php';
-require_once __DIR__ . '/controllers/AuthController.php';
+require_once "config/database.php";
+require_once "models/User.php";
+require_once "controllers/AuthController.php";
 
 $userModel = new User($conn);
 $auth = new AuthController($userModel);
 
-$page = $_GET['page'] ?? 'home';
-$error = '';
-$success = '';
+$page = "home";
+if (isset($_GET["page"])) {
+    $page = $_GET["page"];
+}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $page === 'register') {
+$error = "";
+$success = "";
+
+// Handle the registration form.
+if ($_SERVER["REQUEST_METHOD"] == "POST" && $page == "register") {
     $result = $auth->register($_POST);
-    $error = $result['error'] ?? '';
-    $success = $result['success'] ?? '';
-    if ($success !== '') {
-        $page = 'login';
+
+    if (isset($result["error"])) {
+        $error = $result["error"];
     }
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $page === 'login') {
+
+    if (isset($result["success"])) {
+        $success = $result["success"];
+        $page = "login";
+    }
+}
+
+// Handle the login form.
+if ($_SERVER["REQUEST_METHOD"] == "POST" && $page == "login") {
     $result = $auth->login($_POST);
-    $error = $result['error'] ?? '';
-    if (!empty($result['success'])) {
-        header('Location: index.php?page=dashboard');
+
+    if (isset($result["error"])) {
+        $error = $result["error"];
+    }
+
+    if (isset($result["success"])) {
+        header("Location: index.php?page=dashboard");
         exit;
     }
 }
 
-if ($page === 'logout') {
+// Log out the current user.
+if ($page == "logout") {
     $auth->logout();
-    header('Location: index.php');
+    header("Location: index.php");
     exit;
 }
 
-if ($page === 'dashboard' && empty($_SESSION['user_id'])) {
-    header('Location: index.php?page=login');
+// Only logged-in users can open the dashboard.
+if ($page == "dashboard" && !isset($_SESSION["user_id"])) {
+    header("Location: index.php?page=login");
     exit;
 }
 
-$allowedPages = ['home', 'register', 'login', 'dashboard'];
-if (!in_array($page, $allowedPages, true)) {
-    $page = 'home';
+// Only allow pages that exist in this project.
+if ($page != "home" && $page != "register" && $page != "login" && $page != "dashboard") {
+    $page = "home";
 }
 
-require __DIR__ . '/views/partials/header.php';
-require __DIR__ . '/views/' . $page . '.php';
-require __DIR__ . '/views/partials/footer.php';
+include "views/partials/header.php";
+include "views/" . $page . ".php";
+include "views/partials/footer.php";

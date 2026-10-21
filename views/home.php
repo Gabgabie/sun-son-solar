@@ -1,6 +1,6 @@
 <section class="hero">
     <div class="hero-copy">
-        <p class="eyebrow">CLEAN ENERGY • BRIGHTER FUTURE</p>
+        <p>CLEAN ENERGY • BRIGHTER FUTURE</p>
         <h1>Power Your Future with Solar</h1>
         <p>Explore a cleaner, more energy-conscious future with Sun Son Solar.</p>
         <div class="actions">
@@ -8,7 +8,6 @@
             <a class="button button-outline" href="index.php?page=login">Log in</a>
         </div>
     </div>
-    <div class="sun-art" aria-hidden="true">☀</div>
 </section>
 <section class="feature-grid">
     <article class="feature"><h2>Clean Energy</h2><p>Learn how solar power can support a more sustainable lifestyle.</p></article>

@@ -1,5 +1,5 @@
 <section class="form-card">
-    <p class="eyebrow">WELCOME BACK</p>
+    <p>WELCOME BACK</p>
     <h1>Log in to your account</h1>
     <?php if (!empty($error)): ?><div class="alert error"><?php echo htmlspecialchars($error); ?></div><?php endif; ?>
     <?php if (!empty($success)): ?><div class="alert success"><?php echo htmlspecialchars($success); ?></div><?php endif; ?>

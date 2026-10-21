@@ -1,5 +1,5 @@
 <section class="form-card">
-    <p class="eyebrow">JOIN SUN SON SOLAR</p>
+    <p>JOIN SUN SON SOLAR</p>
     <h1>Create your customer account</h1>
     <p class="muted">Fields marked * are required.</p>
     <?php if (!empty($error)): ?><div class="alert error"><?php echo htmlspecialchars($error); ?></div><?php endif; ?>

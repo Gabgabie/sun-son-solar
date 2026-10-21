@@ -1,42 +1,69 @@
 <?php
 class User {
-    private mysqli $db;
+    private $conn;
 
-    public function __construct(mysqli $connection) {
-        $this->db = $connection;
+    public function __construct($databaseConnection) {
+        $this->conn = $databaseConnection;
     }
 
-    public function findByUsernameOrEmail(string $login) {
-        $stmt = $this->db->prepare(
-            'SELECT id, name, email, username, password_hash, role FROM users WHERE username = ? OR email = ? LIMIT 1'
-        );
-        $stmt->bind_param('ss', $login, $login);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
-        return $user ?: null;
-    }
-
-    public function emailOrUsernameExists(string $email, string $username): bool {
-        $stmt = $this->db->prepare('SELECT id FROM users WHERE email = ? OR username = ? LIMIT 1');
-        $stmt->bind_param('ss', $email, $username);
+    // Check whether an email or username is already in the database.
+    public function accountExists($email, $username) {
+        $sql = "SELECT id FROM users WHERE email = ? OR username = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ss", $email, $username);
         $stmt->execute();
         $stmt->store_result();
-        $exists = $stmt->num_rows > 0;
+
+        $exists = false;
+        if ($stmt->num_rows > 0) {
+            $exists = true;
+        }
+
         $stmt->close();
         return $exists;
     }
 
-    public function createCustomer(string $name, string $email, string $phone, string $username, string $password): bool {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $role = 'customer';
-        $stmt = $this->db->prepare(
-            'INSERT INTO users (name, email, phone, username, password_hash, role) VALUES (?, ?, ?, ?, ?, ?)'
+    // Save a new customer account.
+    public function addCustomer($name, $email, $phone, $username, $password) {
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+        $role = "customer";
+
+        $sql = "INSERT INTO users
+                (name, email, phone, username, password_hash, role)
+                VALUES (?, ?, ?, ?, ?, ?)";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param(
+            "ssssss",
+            $name,
+            $email,
+            $phone,
+            $username,
+            $passwordHash,
+            $role
         );
-        $stmt->bind_param('ssssss', $name, $email, $phone, $username, $hash, $role);
-        $ok = $stmt->execute();
+
+        $saved = $stmt->execute();
         $stmt->close();
-        return $ok;
+
+        return $saved;
+    }
+
+    // Find a user by their username or email.
+    public function findUser($loginName) {
+        $sql = "SELECT id, name, email, username, password_hash, role
+                FROM users
+                WHERE username = ? OR email = ?
+                LIMIT 1";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ss", $loginName, $loginName);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+        $stmt->close();
+
+        return $user;
     }
 }
